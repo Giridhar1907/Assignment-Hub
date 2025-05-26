@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "800364918969",
+    "project_id": "assignmenthub-dbb04",
+    "storage_bucket": "assignmenthub-dbb04.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800364918969:android:b519e3dd20dda35579c368",
+        "android_client_info": {
+          "package_name": "com.example.assignmenthub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUxFaNFMqEWaFMajczWML4YMO_jVe-byU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

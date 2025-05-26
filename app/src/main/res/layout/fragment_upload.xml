@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".ui.upload_job.UploadFragment">
+
+    <!-- CardView Wrapper for Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="32dp">
+
+            <!-- Header -->
+            <TextView
+                android:id="@+id/text_welcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload Job"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:layout_marginBottom="32dp" />
+
+            <!-- Assignment Description -->
+            <EditText
+                android:id="@+id/edit_assignment_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/edittext_bg"
+                android:hint="Assignment Description"
+                android:inputType="textCapWords"
+                android:padding="14dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                android:drawableStart="@drawable/ic_tasks"
+                android:drawablePadding="12dp"/>
+
+            <!-- Upload PDF Button -->
+            <Button
+                android:id="@+id/button_upload_pdf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload PDF"
+                android:backgroundTint="@color/teal_700"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp"
+                android:layout_gravity="center"
+                android:drawablePadding="10dp"/>
+
+            <!-- Cost EditText -->
+            <EditText
+                android:id="@+id/edit_cost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Cost for Writing (₹)"
+                android:inputType="numberDecimal"
+                android:padding="14dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp"
+                android:textColor="@color/black"
+                android:drawablePadding="12dp"/>
+
+            <!-- Deadline EditText -->
+            <EditText
+                android:id="@+id/edit_deadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Deadline (YYYY-MM-DD)"
+                android:inputType="date"
+                android:padding="14dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp"
+                android:drawableStart="@drawable/ic_calender"
+                android:drawablePadding="12dp"/>
+
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/button_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload Request"
+                android:backgroundTint="@color/teal_700"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="14dp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
