@@ -34,6 +34,3 @@ This project is currently under development. If you want to contribute, please f
 ## My Role
 
 As an AI assistant, I helped generate this README file. I can also assist with other development tasks such as writing code, debugging, and providing documentation.
-
----
-*This README was last updated by an AI assistant.*
