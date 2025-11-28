@@ -3,12 +3,17 @@ package com.example.assignmenthub.ui.upload_job
 import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.assignmenthub.R
 import com.example.assignmenthub.databinding.FragmentUploadBinding
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +29,8 @@ class UploadFragment : Fragment() {
     private val pickPdf = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             viewModel.setPdfUri(uri)
-            Toast.makeText(requireContext(), "PDF Selected", Toast.LENGTH_SHORT).show()
+            binding.buttonUploadPdf.text = "PDF Selected"
+            (binding.buttonUploadPdf as MaterialButton).icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circle)
         }
     }
 
@@ -72,13 +78,13 @@ class UploadFragment : Fragment() {
         val pdfUri = viewModel.pdfUri.value
 
         if (assignment.isBlank() || cost.isBlank() || deadline.isBlank() || pdfUri == null) {
-            Toast.makeText(requireContext(), "Please fill all fields and select a PDF", Toast.LENGTH_LONG).show()
+            showConfirmationDialog("Incomplete Form", "Please fill all fields and select a PDF.")
             return
         }
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
-            Toast.makeText(requireContext(), "Please login to upload files", Toast.LENGTH_SHORT).show()
+            showConfirmationDialog("Authentication Error", "Please login to upload files.")
             return
         }
 
@@ -87,31 +93,40 @@ class UploadFragment : Fragment() {
         val pdfRef = storageRef.child(fileName)
 
         pdfRef.putFile(pdfUri)
-            .addOnSuccessListener {
-                pdfRef.downloadUrl.addOnSuccessListener { uri ->
-                    val job = UploadJob(
-                        assignmentDescription = assignment,
-                        cost = cost,
-                        deadline = deadline,
-                        pdfUrl = uri.toString(),
-                        uploaderId = userId // uploaderId added here
-                    )
-                    val dbRef = FirebaseDatabase.getInstance().getReference("upload_jobs")
-                    val key = dbRef.push().key!!
+            .addOnSuccessListener { 
+                val job = UploadJob(
+                    assignmentDescription = assignment,
+                    cost = cost,
+                    deadline = deadline,
+                    pdfPath = fileName, // Store the path instead of the URL
+                    uploaderId = userId
+                )
+                val dbRef = FirebaseDatabase.getInstance().getReference("Jobs")
+                val key = dbRef.push().key!!
 
-                    dbRef.child(key).setValue(job)
-                        .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "Uploaded successfully", Toast.LENGTH_SHORT).show()
-                            clearFields()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(requireContext(), "Database upload failed", Toast.LENGTH_SHORT).show()
-                        }
-                }
+                dbRef.child(key).setValue(job)
+                    .addOnSuccessListener {
+                        dbRef.child(key).child("uploadId").setValue(key) // Set the uploadId
+                        showConfirmationDialog("Success", "Your job has been uploaded successfully.")
+                        clearFields()
+                    }
+                    .addOnFailureListener {
+                        showConfirmationDialog("Database Error", "Failed to upload job details. Please try again.")
+                    }
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "PDF upload failed", Toast.LENGTH_SHORT).show()
+                showConfirmationDialog("Upload Failed", "Failed to upload PDF. Please try again.")
             }
+    }
+
+    private fun showConfirmationDialog(title: String, message: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun clearFields() {
@@ -119,6 +134,8 @@ class UploadFragment : Fragment() {
         binding.editCost.text?.clear()
         binding.editDeadline.text?.clear()
         viewModel.setPdfUri(null)
+        binding.buttonUploadPdf.text = "Upload PDF"
+        (binding.buttonUploadPdf as MaterialButton).icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_upload_file)
     }
 
     override fun onDestroyView() {

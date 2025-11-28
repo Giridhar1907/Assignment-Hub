@@ -4,7 +4,7 @@ data class Upload(
     var assignmentDescription: String = "",
     var cost: String = "",
     var deadline: String = "",
-    var pdfUrl: String? = null,
+    var pdfPath: String? = null, // Changed from pdfUrl
     var locked: Boolean = false,
     var uploadId: String = "",   // Firebase key
     var uploaderId: String = ""  // Firebase user UID

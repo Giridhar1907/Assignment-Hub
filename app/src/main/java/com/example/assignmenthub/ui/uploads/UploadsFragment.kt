@@ -46,7 +46,7 @@ class UploadsFragment : Fragment() {
             return
         }
 
-        val databaseRef = FirebaseDatabase.getInstance().getReference("upload_jobs")
+        val databaseRef = FirebaseDatabase.getInstance().getReference("Jobs")
 
         databaseRef.orderByChild("uploaderId").equalTo(currentUserId)
             .addValueEventListener(object : ValueEventListener {

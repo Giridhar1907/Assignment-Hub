@@ -4,6 +4,6 @@ data class UploadJob(
     val assignmentDescription: String = "",
     val cost: String = "",
     val deadline: String = "",
-    val pdfUrl: String = "",
+    val pdfPath: String = "", // Changed from pdfUrl
     val uploaderId: String = ""
 )

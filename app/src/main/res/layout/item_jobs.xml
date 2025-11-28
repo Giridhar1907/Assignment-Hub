@@ -1,117 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:elevation="6dp"
-    android:padding="20dp"
     app:cardCornerRadius="12dp"
-    android:background="@android:color/white">
+    app:cardElevation="4dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:padding="16dp">
 
-        <!-- Top: Uploader Info -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/uploader_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="User Icon"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/teal_700" />
+
+        <TextView
+            android:id="@+id/uploader_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingBottom="8dp">
+            android:layout_marginStart="12dp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/uploader_icon"
+            app:layout_constraintTop_toTopOf="@id/uploader_icon"
+            tools:text="Uploader Name" />
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@android:drawable/ic_menu_myplaces"
-                android:contentDescription="User Icon"
-                android:layout_marginEnd="12dp"
-                app:tint="@color/teal_700" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/uploader_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Uploader Name"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/uploader_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="email@example.com"
-                    android:textSize="14sp"
-                    android:textColor="#666666" />
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/uploader_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/uploader_name"
+            app:layout_constraintTop_toBottomOf="@id/uploader_name"
+            tools:text="email@example.com" />
 
         <TextView
             android:id="@+id/uploader_reg_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reg No: 123456"
-            android:textSize="14sp"
-            android:textColor="#555555" />
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/uploader_icon"
+            tools:text="Reg No: 123456" />
 
         <TextView
             android:id="@+id/uploader_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone: 9876543210"
-            android:textSize="14sp"
-            android:textColor="#555555"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginStart="16dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toEndOf="@id/uploader_reg_number"
+            app:layout_constraintTop_toTopOf="@id/uploader_reg_number"
+            tools:text="Phone: 9876543210" />
 
-        <!-- Middle: View PDF Button -->
-        <Button
-            android:id="@+id/btn_view_pdf"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View PDF"
-            android:textStyle="bold"
-            android:layout_margin="20dp"
-            android:backgroundTint="@color/teal_700"
-            android:textColor="@android:color/white"
-            android:layout_marginVertical="10dp" />
-
-        <!-- Bottom: Job Details -->
         <TextView
             android:id="@+id/job_assignment_description"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Assignment: Create a portfolio"
-            android:textSize="15sp"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBody1"
             android:textStyle="italic"
-            android:textColor="#000000" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/uploader_reg_number"
+            tools:text="Assignment: Create a portfolio" />
 
         <TextView
             android:id="@+id/job_cost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cost: ₹500"
-            android:textSize="15sp"
-            android:textColor="#333333" />
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/job_assignment_description"
+            tools:text="Cost: ₹500" />
 
         <TextView
             android:id="@+id/job_due_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Due: 25 May 2025"
-            android:textSize="15sp"
-            android:textColor="#333333"
-            android:layout_marginTop="4dp" />
+            android:layout_marginStart="16dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toEndOf="@id/job_cost"
+            app:layout_constraintTop_toTopOf="@id/job_cost"
+            tools:text="Due: 25 May 2025" />
 
-    </LinearLayout>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/job_cost" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_view_pdf"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:layout_marginTop="16dp"
+            android:text="View PDF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

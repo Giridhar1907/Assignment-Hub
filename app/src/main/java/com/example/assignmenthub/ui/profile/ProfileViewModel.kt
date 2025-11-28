@@ -8,7 +8,6 @@ import com.google.firebase.database.*
 
 data class UserProfile(
     var username: String? = null,
-    var regd: String? = null,
     var number: String? = null,
     var email: String? = null
 )

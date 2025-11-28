@@ -1,12 +1,15 @@
 package com.example.assignmenthub.ui.home
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignmenthub.R
+import com.google.android.material.button.MaterialButton
 
 class UploadsAdapter(
     private val uploads: List<Upload>,
@@ -14,38 +17,48 @@ class UploadsAdapter(
 ) : RecyclerView.Adapter<UploadsAdapter.UploadViewHolder>() {
 
     inner class UploadViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val jobTitle: TextView = view.findViewById(R.id.job_title)
         val description: TextView = view.findViewById(R.id.job_assignment_description)
         val cost: TextView = view.findViewById(R.id.job_cost)
         val deadline: TextView = view.findViewById(R.id.job_due_date)
+        val viewPdfButton: MaterialButton = view.findViewById(R.id.btn_view_pdf)
         val uploaderName: TextView = view.findViewById(R.id.uploader_name)
-        val uploaderEmail: TextView = view.findViewById(R.id.uploader_email)
-        val uploaderRegd: TextView = view.findViewById(R.id.uploader_reg_number)
-        val uploaderNumber: TextView = view.findViewById(R.id.uploader_phone)
-        val viewPdfButton: Button = view.findViewById(R.id.btn_view_pdf)
+        val uploaderPhone: TextView = view.findViewById(R.id.uploader_phone)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UploadViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_jobs, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_job, parent, false)
+        // Hide buttons not relevant for the home screen
+        view.findViewById<MaterialButton>(R.id.btn_lock_unlock).visibility = View.GONE
+        view.findViewById<MaterialButton>(R.id.btn_delete).visibility = View.GONE
         return UploadViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: UploadViewHolder, position: Int) {
         val upload = uploads[position]
-        holder.description.text = "Description: ${upload.assignmentDescription}"
-        holder.cost.text = "Cost: ${upload.cost}"
-        holder.deadline.text = "Deadline: ${upload.deadline}"
-        holder.uploaderName.text = "Name: ${upload.username}"
-        holder.uploaderEmail.text = "Email: ${upload.email}"
-        holder.uploaderRegd.text = "Reg No: ${upload.regd}"
-        holder.uploaderNumber.text = "Phone: ${upload.number}"
+        holder.jobTitle.text = upload.assignmentDescription // Or a more specific title field
+        holder.description.text = upload.assignmentDescription
+        holder.cost.text = "₹${upload.cost}"
+        holder.deadline.text = upload.deadline
+        holder.uploaderName.text = upload.username
+        holder.uploaderPhone.text = upload.number
 
-        if (!upload.pdfUrl.isNullOrEmpty()) {
+        if (!upload.pdfPath.isNullOrEmpty()) {
             holder.viewPdfButton.visibility = View.VISIBLE
             holder.viewPdfButton.setOnClickListener {
-                onPdfClick(upload.pdfUrl!!)
+                onPdfClick(upload.pdfPath!!)
             }
         } else {
             holder.viewPdfButton.visibility = View.GONE
+        }
+
+        // Set OnClickListener for the phone number
+        holder.uploaderPhone.setOnClickListener {
+            val phoneNumber = holder.uploaderPhone.text.toString()
+            val intent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:$phoneNumber")
+            }
+            startActivity(holder.itemView.context, intent, null)
         }
     }
 

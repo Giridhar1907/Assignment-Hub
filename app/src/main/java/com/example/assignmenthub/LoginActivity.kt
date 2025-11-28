@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -52,6 +53,11 @@ class LoginActivity : AppCompatActivity() {
                         ref.get().addOnSuccessListener { snapshot ->
                             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
 
+                            val sharedPref = getSharedPreferences("UserSession", MODE_PRIVATE)
+                            sharedPref.edit {
+                                putBoolean("isLoggedIn", true)
+                            }
+
                             val intent = Intent(this, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)
@@ -78,7 +84,9 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
+        val sharedPref = getSharedPreferences("UserSession", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
+        if (currentUser != null && isLoggedIn) {
             // User already logged in, go to MainActivity
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

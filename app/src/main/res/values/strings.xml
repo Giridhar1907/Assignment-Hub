@@ -13,4 +13,23 @@
     <string name="log_out">Log Out</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- New Strings for UI Redesign -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
+    <string name="upload_a_new_job">Upload a New Job</string>
+    <string name="assignment_description">Assignment Description</string>
+    <string name="cost_for_writing">Cost for Writing (₹)</string>
+    <string name="deadline_yyyy_mm_dd">Deadline (YYYY-MM-DD)</string>
+    <string name="upload_pdf">Upload PDF</string>
+    <string name="upload_request">Upload Request</string>
+    <string name="your_jobs">Your Jobs</string>
+    <string name="job_icon">Job Icon</string>
+    <string name="view_pdf">View PDF</string>
+    <string name="username">Username</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="save_changes">Save Changes</string>
 </resources>

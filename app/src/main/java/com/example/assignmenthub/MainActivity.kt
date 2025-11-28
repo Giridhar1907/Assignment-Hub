@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import androidx.core.content.edit
+import androidx.appcompat.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,8 +39,9 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("UserSession", MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
+        val currentUser = auth.currentUser
 
-        if (!isLoggedIn) {
+        if (!isLoggedIn || currentUser == null) {
             redirectToLogin()
             return
         }
@@ -47,7 +49,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        // Use findViewById to get the Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -62,12 +66,6 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            redirectToLogin()
-            return
-        }
 
         val uid = currentUser.uid
         userRef = database.reference.child("users").child(uid)
@@ -87,12 +85,10 @@ class MainActivity : AppCompatActivity() {
 
         userRef?.addValueEventListener(userListener!!)
 
-        val sharedPreference = getSharedPreferences("UserSession", MODE_PRIVATE)
-
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.log_out -> {
-                    sharedPreference.edit { clear() }
+                    sharedPref.edit { clear() }
                     FirebaseAuth.getInstance().signOut()
 
                     val intent = Intent(this, LoginActivity::class.java).apply {
@@ -111,12 +107,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun redirectToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        userListener?.let {
+            userRef?.removeEventListener(it)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

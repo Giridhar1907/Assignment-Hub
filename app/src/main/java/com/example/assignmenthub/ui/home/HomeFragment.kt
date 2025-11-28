@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignmenthub.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 
 class HomeFragment : Fragment() {
 
@@ -31,108 +32,84 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
-        fetchUploadsRealtime()
+        fetchUploads()
 
         return binding.root
     }
 
     private fun setupRecyclerView() {
-        uploadsAdapter = UploadsAdapter(uploadsList) { pdfUrl ->
-            openPdf(pdfUrl)
+        uploadsAdapter = UploadsAdapter(uploadsList) { pdfPath ->
+            openPdf(pdfPath)
         }
         binding.uploadsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.uploadsRecyclerView.adapter = uploadsAdapter
     }
 
-    private fun fetchUploadsRealtime() {
-        databaseRef = FirebaseDatabase.getInstance().getReference("upload_jobs")
+    private fun fetchUploads() {
+        databaseRef = FirebaseDatabase.getInstance().getReference("Jobs")
+        val currentUserId = auth.currentUser?.uid ?: ""
 
-        databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 uploadsList.clear()
-                val currentUserId = auth.currentUser?.uid ?: ""
-                val tempList = mutableListOf<Upload>()
-                val uploadsToProcess = mutableListOf<DataSnapshot>()
-
-                for (postSnapshot in snapshot.children) {
-                    val upload = postSnapshot.getValue(Upload::class.java)
-                    if (upload != null && upload.uploaderId != currentUserId && !upload.locked) {
-                        uploadsToProcess.add(postSnapshot)
+                if (!snapshot.exists()) {
+                    if (isAdded) {
+                        Toast.makeText(context, "No jobs found", Toast.LENGTH_SHORT).show()
                     }
-                }
-
-                if (uploadsToProcess.isEmpty()) {
-                    uploadsAdapter.notifyDataSetChanged()
-                    Toast.makeText(requireContext(), "No uploads found", Toast.LENGTH_SHORT).show()
                     return
                 }
 
-                var processedCount = 0
-
-                for (postSnapshot in uploadsToProcess) {
-                    val upload = postSnapshot.getValue(Upload::class.java) ?: continue
-                    val uploaderId = upload.uploaderId ?: continue
-                    val userRef = FirebaseDatabase.getInstance().getReference("users").child(uploaderId)
-
-                    userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(userSnapshot: DataSnapshot) {
-                            val enhancedUpload = upload.copy(
-                                username = userSnapshot.child("username").getValue(String::class.java),
-                                email = userSnapshot.child("email").getValue(String::class.java),
-                                regd = userSnapshot.child("regd").getValue(String::class.java),
-                                number = userSnapshot.child("number").getValue(String::class.java)
-                            )
-                            tempList.add(enhancedUpload)
-
-                            processedCount++
-                            if (processedCount == uploadsToProcess.size) {
-                                uploadsList.clear()
-                                uploadsList.addAll(tempList)
-                                uploadsAdapter.notifyDataSetChanged()
-                                if (uploadsList.isEmpty()) {
-                                    Toast.makeText(requireContext(), "No uploads found", Toast.LENGTH_SHORT).show()
-                                }
+                for (jobSnapshot in snapshot.children) {
+                    val job = jobSnapshot.getValue(Upload::class.java)
+                    if (job != null && job.uploaderId != null && job.uploaderId != currentUserId && !job.locked) {
+                        val userRef = FirebaseDatabase.getInstance().getReference("users").child(job.uploaderId)
+                        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(userSnapshot: DataSnapshot) {
+                                val enhancedUpload = job.copy(
+                                    username = userSnapshot.child("username").getValue(String::class.java),
+                                    email = userSnapshot.child("email").getValue(String::class.java),
+                                    regd = userSnapshot.child("regd").getValue(String::class.java),
+                                    number = userSnapshot.child("number").getValue(String::class.java)
+                                )
+                                uploadsList.add(enhancedUpload)
+                                uploadsAdapter.notifyItemInserted(uploadsList.size - 1)
                             }
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            processedCount++
-                            if (processedCount == uploadsToProcess.size) {
-                                uploadsList.clear()
-                                uploadsList.addAll(tempList)
-                                uploadsAdapter.notifyDataSetChanged()
-                                if (uploadsList.isEmpty()) {
-                                    Toast.makeText(requireContext(), "No uploads found", Toast.LENGTH_SHORT).show()
-                                }
+                            override fun onCancelled(error: DatabaseError) {
+                                Log.e("HomeFragment", "User data fetch failed: ${error.message}")
                             }
-                            Log.e("HomeFragment", "User data fetch failed: ${error.message}")
-                        }
-                    })
+                        })
+                    }
+                }
+                if (uploadsList.isEmpty() && isAdded) {
+                    Toast.makeText(context, "No other jobs found", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load uploads: ${error.message}", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Toast.makeText(context, "Failed to load jobs: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }
 
-
-
-
-
-    private fun openPdf(pdfUrl: String) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(Uri.parse(pdfUrl), "application/pdf")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        val chooser = Intent.createChooser(intent, "Open PDF")
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
-            startActivity(chooser)
-        } else {
-            // fallback: open in browser
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
-            startActivity(browserIntent)
+    private fun openPdf(pdfPath: String) {
+        val storageRef = FirebaseStorage.getInstance().getReference(pdfPath)
+        storageRef.downloadUrl.addOnSuccessListener { uri ->
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/pdf")
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            val chooser = Intent.createChooser(intent, "Open PDF")
+            if (intent.resolveActivity(requireContext().packageManager) != null) {
+                startActivity(chooser)
+            } else {
+                val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(browserIntent)
+            }
+        }.addOnFailureListener { 
+            Toast.makeText(requireContext(), "Failed to get PDF URL", Toast.LENGTH_SHORT).show()
         }
     }
 
